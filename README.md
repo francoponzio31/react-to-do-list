@@ -1,1 +1,1 @@
-Basic to do lists projects made with react
+Basic to do list projects made with react
