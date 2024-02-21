@@ -1,0 +1,8 @@
+version: '3.9'
+services:
+  app:
+    build: .
+    environment:
+      - STATIC_FOLDER_PATH=./static
+    ports:
+      - 8000:8000

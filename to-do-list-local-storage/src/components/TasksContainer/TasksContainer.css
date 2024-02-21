@@ -1,0 +1,9 @@
+.tasksContainer{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    label{
+        font-size: 1.2em;
+    }
+}
