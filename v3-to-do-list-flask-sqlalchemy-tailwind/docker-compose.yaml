@@ -1,0 +1,30 @@
+version: '3.9'
+services:
+  app:
+    build: .
+    environment:
+      STATIC_FOLDER_PATH: ./static
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    volumes:
+      - ./backend/src:/app
+      - ./frontend/dist:/app/static
+    depends_on:
+      - db
+    ports:
+      - 8000:8000
+
+  db:
+    image: mysql
+    environment:
+      MYSQL_DATABASE: to_do_list
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - 3307:3306
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
