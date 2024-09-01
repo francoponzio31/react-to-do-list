@@ -19,8 +19,6 @@ function TaskStatusBudget({done}){
 
 export default function TaskCard({id, text, done}){
 
-    console.log("Task ID:", id)
-
     const [_, setTasks] = useContext(TasksContext)
     const [editing, setEditing] = useState(false)
     const [inputText, setInputText] = useState(text)
