@@ -6,7 +6,7 @@ urlpatterns = [
     path(
         "",
         views.TasksViewSet.as_view({
-            "get": "get_tasks",
+            "get": "get_current_user_tasks",
             "post": "create_task",
         })
     ),

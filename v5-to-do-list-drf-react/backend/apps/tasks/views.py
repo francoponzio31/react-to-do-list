@@ -1,6 +1,7 @@
 from rest_framework.viewsets import ViewSet
 from rest_framework import serializers
-from utils.utils import get_success_response, get_error_response
+from rest_framework import status
+from utils.custom_responses import get_success_response, get_error_response
 from .serializers import TaskOutputSerializer, TaskBodySerializer
 from .models import Task
 from . import services
@@ -11,42 +12,43 @@ logger = logging.getLogger(__name__)
 
 class TasksViewSet(ViewSet):
 
-    def get_tasks(self, request):
+    def get_current_user_tasks(self, request):
         try:
-            tasks = services.get_tasks()
+            current_user_id = request.user.id
+            tasks = services.get_user_tasks(current_user_id)
             tasks_output = TaskOutputSerializer(tasks, many=True)
-            return get_success_response(status=200, message="Successful search", tasks=tasks_output.data)
+            return get_success_response(status=status.HTTP_200_OK, tasks=tasks_output.data)
         except Exception as ex:
             logger.exception(ex)
-            return get_error_response(status=500, message="Internal server error")
+            return get_error_response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
     def get_task(self, request, task_id):
         try:
             task = services.get_task_by_id(task_id)
             task_output = TaskOutputSerializer(task)
-            return get_success_response(status=200, message="Successful search", task=task_output.data)
+            return get_success_response(status=status.HTTP_200_OK, task=task_output.data)
         except Task.DoesNotExist as ex:
             logger.error(ex)
-            return get_error_response(status=404, message=f"Task with id {task_id} not found")
+            return get_error_response(status=status.HTTP_404_NOT_FOUND, message=f"Task with id {task_id} not found")
         except Exception as ex:
             logger.exception(ex)
-            return get_error_response(status=500, message="Internal server error")
+            return get_error_response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
     def create_task(self, request):
         try:
             body_serializer = TaskBodySerializer(data=request.data)
             body_serializer.is_valid(raise_exception=True)
-            new_task = services.create_task(**body_serializer.validated_data)
+            new_task = services.create_task(user_id=request.user.id, **body_serializer.validated_data)
             task_output = TaskOutputSerializer(new_task)
-            return get_success_response(status=201, message="Successful creation", task=task_output.data)
+            return get_success_response(status=status.HTTP_201_CREATED, task=task_output.data)
         except serializers.ValidationError as ex:
             logger.error(ex)
-            return get_error_response(status=400, message="Invalid task data", errors=body_serializer.errors)
+            return get_error_response(status=status.HTTP_400_BAD_REQUEST, message="Invalid task data", errors=body_serializer.errors)
         except Exception as ex:
             logger.exception(ex)
-            return get_error_response(status=500, message="Internal server error")
+            return get_error_response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
     def update_task(self, request, task_id):
@@ -55,25 +57,25 @@ class TasksViewSet(ViewSet):
             body_serializer.is_valid(raise_exception=True)
             updated_task = services.update_task(task_id, **body_serializer.validated_data)
             task_output = TaskOutputSerializer(updated_task)
-            return get_success_response(status=200, message="Successful update", task=task_output.data)
+            return get_success_response(status=status.HTTP_200_OK, task=task_output.data)
         except serializers.ValidationError as ex:
             logger.error(ex)
-            return get_error_response(status=400, message="Invalid task data", errors=body_serializer.errors)
+            return get_error_response(status=status.HTTP_400_BAD_REQUEST, message="Invalid task data", errors=body_serializer.errors)
         except Task.DoesNotExist as ex:
             logger.error(ex)
-            return get_error_response(status=404, message=f"Task with id {task_id} not found")
+            return get_error_response(status=status.HTTP_404_NOT_FOUND, message=f"Task with id {task_id} not found")
         except Exception as ex:
             logger.exception(ex)
-            return get_error_response(status=500, message="Internal server error")
+            return get_error_response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
     def delete_task(self, request, task_id):
         try:
             services.delete_task(task_id)
-            return get_success_response(status=204, message=f"Task with id {task_id} deleted")
+            return get_success_response(status=status.HTTP_204_NO_CONTENT)
         except Task.DoesNotExist as ex:
             logger.error(ex)
-            return get_error_response(status=404, message=f"Task with id {task_id} not found")
+            return get_error_response(status=status.HTTP_404_NOT_FOUND, message=f"Task with id {task_id} not found")
         except Exception as ex:
             logger.exception(ex)
-            return get_error_response(status=500, message="Internal server error")
+            return get_error_response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

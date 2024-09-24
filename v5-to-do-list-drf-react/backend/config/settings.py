@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,8 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_simplejwt',
     'corsheaders',
     'apps.tasks',
+    'apps.users',
+    'apps.auth',
 ]
 
 MIDDLEWARE = [
@@ -103,6 +107,21 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'apps.auth.authentication.CustomJWTAuthentication',
+    ),
+    "EXCEPTION_HANDLER": "utils.exceptions_handler.custom_exception_handler",
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
+
+SECRET_KEY_JWT = "token_secret"
+JWT_ALGORITHM = "HS256"
+JWT_VERIFY_EXPIRATION = False
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/

@@ -10,4 +10,5 @@ class TaskOutputSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     text = serializers.CharField()
     done = serializers.BooleanField()
+    user_id = serializers.IntegerField()
     created_at = serializers.DateTimeField()

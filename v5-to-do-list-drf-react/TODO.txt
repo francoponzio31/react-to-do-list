@@ -1,3 +1,2 @@
 PAGINACION
-RELACION 1 a muchos con users
 AUTH: https://gitlab.extranet.fluxit.com.ar/internal-tools/arquitectura/-/wikis/Seguridad
