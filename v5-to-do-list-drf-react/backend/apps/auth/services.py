@@ -6,13 +6,13 @@ from utils.custom_exceptions import InvalidCredentialsError, UsernameAlreadyRegi
 def login(username: str, password: str) -> User:
     try:
         user = User.objects.get(username=username)
-        
-        if not check_hashed_password(password, user.password):
-            raise InvalidCredentialsError
-        
-        return encode_token(user.id, username), user
     except User.DoesNotExist:
         raise InvalidCredentialsError
+    
+    if not check_hashed_password(password, user.password):
+        raise InvalidCredentialsError
+    
+    return encode_token(user.id, username), user
 
 
 def signup(username: str, password: str) -> User:

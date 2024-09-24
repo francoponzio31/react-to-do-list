@@ -72,7 +72,7 @@ class TasksViewSet(ViewSet):
     def delete_task(self, request, task_id):
         try:
             services.delete_task(task_id)
-            return get_success_response(status=status.HTTP_204_NO_CONTENT)
+            return get_success_response(status=status.HTTP_204_NO_CONTENT, message=f"Task with id {task_id} deleted")
         except Task.DoesNotExist as ex:
             logger.error(ex)
             return get_error_response(status=status.HTTP_404_NOT_FOUND, message=f"Task with id {task_id} not found")
