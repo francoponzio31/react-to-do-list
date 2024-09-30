@@ -18,7 +18,7 @@ class TasksViewSet(ViewSet):
             current_user_id = request.user.id
             params_serializer = PaginationParamsSerializer(
                 data=request.query_params,
-                context={"valid_fields": ["id", "done", "text", "created_at", "user_id"]}
+                context={"sorting_fields": ["id", "done", "text", "created_at", "user_id"]}
             )
             params_serializer.is_valid(raise_exception=True)
             tasks, total_items = services.get_user_tasks(current_user_id, **params_serializer.validated_data)

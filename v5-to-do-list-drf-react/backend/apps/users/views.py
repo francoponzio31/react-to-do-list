@@ -17,7 +17,7 @@ class ListUsersView(APIView):
         try:
             params_serializer = PaginationParamsSerializer(
                 data=request.query_params,
-                context={"valid_fields": ["id", "username", "creation_date"]}
+                context={"sorting_fields": ["id", "username", "creation_date"]}
             )
             params_serializer.is_valid(raise_exception=True)
             users, total_items = services.get_users(**params_serializer.validated_data)
