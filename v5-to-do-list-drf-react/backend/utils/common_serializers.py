@@ -14,7 +14,7 @@ class PaginationParamsSerializer(serializers.Serializer):
         value = humps.decamelize(value)
         valid_fields = self.context.get("valid_fields", [])
         if value.lstrip("-") not in valid_fields:
-            raise serializers.ValidationError(f"Invalid sort field: '{value}'. Valid fields are: {', '.join(valid_fields)}")
+            raise serializers.ValidationError(f"Invalid sort field: '{value}'. Valid fields are: {', '.join([humps.camelize(field) for field in valid_fields])}")
         
         return value
     
