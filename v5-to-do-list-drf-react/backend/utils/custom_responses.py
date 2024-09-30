@@ -1,11 +1,10 @@
 from rest_framework.response import Response
 from datetime import datetime
-from humps import camelize
 from http import HTTPStatus
 
 
 def _get_base_response(status:int, **kwargs) -> Response:
-    return Response(camelize(**kwargs), status=status)
+    return Response(kwargs, status=status)
 
 
 def get_success_response(status:int, **kwargs) -> Response:

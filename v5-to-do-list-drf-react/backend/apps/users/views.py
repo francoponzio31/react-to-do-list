@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from rest_framework import status
 from utils.custom_responses import get_success_response, get_error_response
 from .serializers import UserOutputSerializer
+from utils.common_serializers import PaginationParamsSerializer
+from rest_framework.serializers import ValidationError
 from .models import User
 from . import services
 import logging
@@ -13,9 +15,17 @@ class ListUsersView(APIView):
 
     def get(self, request):
         try:
-            users = services.get_users()
+            params_serializer = PaginationParamsSerializer(
+                data=request.query_params,
+                context={"valid_fields": ["id", "username", "creation_date"]}
+            )
+            params_serializer.is_valid(raise_exception=True)
+            users, total_items = services.get_users(**params_serializer.validated_data)
             users_output = UserOutputSerializer(users, many=True)
-            return get_success_response(status=status.HTTP_200_OK, users=users_output.data)
+            return get_success_response(status=status.HTTP_200_OK, users=users_output.data, total=total_items)
+        except ValidationError as ex:
+            logger.error(ex)
+            return get_error_response(status=status.HTTP_400_BAD_REQUEST, message="Invalid search data", errors=params_serializer.errors)
         except Exception as ex:
             logger.exception(ex)
             return get_error_response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -1,5 +1,5 @@
 from rest_framework.views import APIView
-from rest_framework import serializers
+from rest_framework.serializers import ValidationError
 from rest_framework import status
 from utils.custom_responses import get_success_response, get_error_response
 from .serializers import LoginBodySerializer, SignupBodySerializer, UserOutputSerializer
@@ -21,7 +21,7 @@ class LoginView(APIView):
             token, user = services.login(**body_serializer.validated_data)
             user_output = UserOutputSerializer(user)
             return get_success_response(status=status.HTTP_200_OK, tokenJWT=token, userDTO=user_output.data)
-        except serializers.ValidationError as ex:
+        except ValidationError as ex:
             logger.error(ex)
             return get_error_response(status=status.HTTP_400_BAD_REQUEST, message="Invalid user data", errors=body_serializer.errors)
         except InvalidCredentialsError as ex:
@@ -44,7 +44,7 @@ class SignupView(APIView):
             new_user = services.signup(**body_serializer.validated_data)
             user_output = UserOutputSerializer(new_user)
             return get_success_response(status=status.HTTP_201_CREATED, user=user_output.data)
-        except serializers.ValidationError as ex:
+        except ValidationError as ex:
             logger.error(ex)
             return get_error_response(status=status.HTTP_400_BAD_REQUEST, message="Invalid user data", errors=body_serializer.errors)
         except UsernameAlreadyRegisteredError as ex:

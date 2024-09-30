@@ -55,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'utils.parsers.DecamelizeQueryParamsMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -112,6 +113,12 @@ REST_FRAMEWORK = {
         'apps.auth.authentication.CustomJWTAuthentication',
     ),
     "EXCEPTION_HANDLER": "utils.exceptions_handler.custom_exception_handler",
+    'DEFAULT_PARSER_CLASSES': [
+        'utils.parsers.SnakeCaseParser',
+    ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'utils.parsers.CamelCaseRenderer',
+    ],
 }
 
 SIMPLE_JWT = {
