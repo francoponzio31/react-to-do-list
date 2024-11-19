@@ -4,7 +4,7 @@ import humps
 
 class PaginationParamsSerializer(serializers.Serializer):
     offset = serializers.IntegerField(required=False, default=0)
-    limit = serializers.IntegerField(required=False, default=20)
+    limit = serializers.IntegerField(required=False, default=10)
     sort = serializers.CharField(required=False, default="")
 
     def validate_sort(self, value:str):

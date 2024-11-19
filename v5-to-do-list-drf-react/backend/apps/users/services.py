@@ -2,13 +2,17 @@ from .models import User
 
 
 def get_users(offset:int, limit:int, sort:str) -> tuple[list[User], int]:
-    if not sort:
-        results = User.objects.all()[offset:limit]
-    else:
-        results = User.objects.all().order_by(sort)[offset:limit]
+
+    queryset = User.objects.all()
+
+    if sort:
+        queryset = queryset.order_by(sort)
 
     total_items = User.objects.count()
-    return results, total_items
+
+    users = queryset[offset:offset+limit]
+
+    return users, total_items
 
 
 def get_user_by_id(task_id:int) -> User:
