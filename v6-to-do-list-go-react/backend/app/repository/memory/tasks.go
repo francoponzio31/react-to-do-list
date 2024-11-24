@@ -1,4 +1,4 @@
-package repository
+package memory
 
 import (
 	"errors"
@@ -7,12 +7,14 @@ import (
 )
 
 var (
-	tasksDB   = make(map[int]schemas.TaskSchema) // Almacenamiento en memoria
-	nextID    = 1                                // ID autoincremental
-	tasksLock = sync.Mutex{}                     // Mutex para concurrencia
+	tasksDB   = make(map[int]schemas.TaskSchema)
+	nextID    = 1
+	tasksLock = sync.Mutex{}
 )
 
-func GetTasks() ([]schemas.TaskSchema, error) {
+type MemoryTaskRepository struct{}
+
+func (r *MemoryTaskRepository) GetTasks() ([]schemas.TaskSchema, error) {
 	tasksLock.Lock()
 	defer tasksLock.Unlock()
 
@@ -20,11 +22,10 @@ func GetTasks() ([]schemas.TaskSchema, error) {
 	for _, task := range tasksDB {
 		tasks = append(tasks, task)
 	}
-
 	return tasks, nil
 }
 
-func GetTaskById(taskId int) (schemas.TaskSchema, error) {
+func (r *MemoryTaskRepository) GetTaskById(taskId int) (schemas.TaskSchema, error) {
 	tasksLock.Lock()
 	defer tasksLock.Unlock()
 
@@ -32,22 +33,20 @@ func GetTaskById(taskId int) (schemas.TaskSchema, error) {
 	if !exists {
 		return schemas.TaskSchema{}, errors.New("task not found")
 	}
-
 	return task, nil
 }
 
-func CreateTask(taskData schemas.TaskSchema) (schemas.TaskSchema, error) {
+func (r *MemoryTaskRepository) CreateTask(taskData schemas.TaskSchema) (schemas.TaskSchema, error) {
 	tasksLock.Lock()
 	defer tasksLock.Unlock()
 
 	taskData.ID = nextID
-	tasksDB[nextID] = taskData
 	nextID++
-
+	tasksDB[taskData.ID] = taskData
 	return taskData, nil
 }
 
-func UpdateTaskById(taskId int, newTaskData schemas.UpdateTaskSchema) (schemas.TaskSchema, error) {
+func (r *MemoryTaskRepository) UpdateTaskById(taskId int, newTaskData schemas.UpdateTaskSchema) (schemas.TaskSchema, error) {
 	tasksLock.Lock()
 	defer tasksLock.Unlock()
 
@@ -68,7 +67,7 @@ func UpdateTaskById(taskId int, newTaskData schemas.UpdateTaskSchema) (schemas.T
 	return task, nil
 }
 
-func DeleteTaskById(taskId int) error {
+func (r *MemoryTaskRepository) DeleteTaskById(taskId int) error {
 	tasksLock.Lock()
 	defer tasksLock.Unlock()
 
@@ -78,5 +77,22 @@ func DeleteTaskById(taskId int) error {
 	}
 
 	delete(tasksDB, taskId)
+	return nil
+}
+
+func (r *MemoryTaskRepository) DeleteTasksByIds(taskIds []int) error {
+	tasksLock.Lock()
+	defer tasksLock.Unlock()
+
+	for _, taskId := range taskIds {
+		if _, exists := tasksDB[taskId]; !exists {
+			return errors.New("one or more tasks not found")
+		}
+	}
+
+	for _, taskId := range taskIds {
+		delete(tasksDB, taskId)
+	}
+
 	return nil
 }
